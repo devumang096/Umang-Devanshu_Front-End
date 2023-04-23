@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Umang-Devanshu_Front-End/static/css/main.e6c13ad2.css",
+    "main.js": "/Umang-Devanshu_Front-End/static/js/main.0d9cf826.js",
+    "static/js/787.0420ccf9.chunk.js": "/Umang-Devanshu_Front-End/static/js/787.0420ccf9.chunk.js",
+    "index.html": "/Umang-Devanshu_Front-End/index.html",
+    "main.e6c13ad2.css.map": "/Umang-Devanshu_Front-End/static/css/main.e6c13ad2.css.map",
+    "main.0d9cf826.js.map": "/Umang-Devanshu_Front-End/static/js/main.0d9cf826.js.map",
+    "787.0420ccf9.chunk.js.map": "/Umang-Devanshu_Front-End/static/js/787.0420ccf9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.0d9cf826.js"
+  ]
+}
