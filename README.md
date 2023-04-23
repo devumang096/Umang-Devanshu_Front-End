@@ -1,70 +1,210 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Steeleye Assignment
+ 
+### 1.Explain what the simple List component does.
 
-## Available Scripts
+The simple `List` component is a basic React component that displays a list of items on a webpage. It takes an array of items as a prop and renders a list item for each element in the array.
 
-In the project directory, you can run:
+Here's an example of how to use the `SimpleList component` in a simple app.js code.
 
-### `npm start`
+```javascript
+import React from 'react';
+import SimpleList from './SimpleList';
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+function App() {
+  const items = [
+    { id: 1, name: 'Item 1' },
+    { id: 2, name: 'Item 2' },
+    { id: 3, name: 'Item 3' },
+  ];
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  return (
+    <div>
+      <h1>My List</h1>
+      <SimpleList items={items} />
+    </div>
+  );
+}
 
-### `npm test`
+export default App;
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2.What problems / warnings are there with code?
 
-### `npm run build`
+- In the `SingleListItem` component, the onClick event handler is passed the result of onClickHandler(index) instead of a function. This means that the `onClick event` will be immediately triggered when the component is rendered. To fix this, change 
+```
+onClick={onClickHandler(index)} to onClick={() => onClickHandler(index)}.
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- The key `prop`, which React requires when rendering a list of elements, has been removed from the `SingleListItem` component. This will result in a warning and could impact the rendering's performance and accuracy.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- The items prop's default value in the `WrappedListComponent` component is set to `null`, which is inconsistent with the anticipated structure of the items prop. Change the elements' default value to an `empty array[]`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- In the `WrappedListComponent` component, the items `prop` is declared as an array of objects with a `text property`, but the array `prop type` is used instead of `arrayOf`. To fix this, change `PropTypes.array` to `PropTypes.arrayOf`.
 
-### `npm run eject`
+- In the `WrappedListComponent` component, the state hook `useState` is called with `no initial value`. This means that the initial value of `selectedIndex` will be `undefined`, which can cause unexpected behavior. To fix this, add an initial value to useState like so: 
+```
+const [selectedIndex, setSelectedIndex] = useState(null);
+```
+- The `WrappedListComponent` component does not handle the case when the items `prop` is `null` or `undefined`. This will cause an `error` when trying to `map over the items array`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 3.Please fix, optimize, and/or modify the component as much as you think is necessary.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- It should have a default value since index is not a necessary prop for the WrappedSingleListItem component:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+WrappedSingleListItem.defaultProps = {
+  index: 0,
+};
+```
 
-## Learn More
+- Instead of using the index itself, onClickHandler in WrappedSingleListItem should be called with a function that returns the index:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+onClick={onClickHandler(() => index)}
+```
+- The default value for the items parameter in the WrappedListComponent should be an empty array, not null:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+WrappedListComponent.defaultProps = {
+  items: [],
+};
 
-### Code Splitting
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- The onClickHandler function in the WrappedListComponent should be declared outside the render method so that it isn't repeated each time the component is rendered:
 
-### Analyzing the Bundle Size
+```javascript
+const handleClick = index => {
+  setSelectedIndex(index);
+};
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+return (
+  <ul style={{ textAlign: 'left' }}>
+    {items.map((item, index) => (
+      <SingleListItem
+        onClickHandler={() => handleClick(index)}
+        text={item.text}
+        index={index}
+        isSelected={selectedIndex === index}
+        key={index} // add key prop to avoid warning
+      />
+    ))}
+  </ul>
+);
 
-### Making a Progressive Web App
+```
+- The memo function should be called on the function returning the component in WrappedSingleListItem, not on the component itself.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```
+const SingleListItem = memo((props) => <WrappedSingleListItem {...props} />);
 
-### Advanced Configuration
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Modified code
+```javascript
+import React, { useState, useEffect, memo } from 'react';
+import PropTypes from 'prop-types';
+//style
+const listItemStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '10px',
+  backgroundColor: 'red',
+  border: '1px solid black',
+  borderRadius: '5px',
+  marginBottom: '5px',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease-in-out',
+};
+//css style
+const selectedStyles = {
+  backgroundColor: 'green',
+  color: 'white',
+};
 
-### Deployment
+const textStyles = {
+  margin: 0,
+};
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+// Single List Item
+const SingleListItem = memo(({ index, isSelected, onClickHandler, text }) => (
+  <li
+    style={{
+      ...listItemStyles,
+      ...(isSelected ? selectedStyles : null),
+    }}
+    onClick={() => onClickHandler(index)} 
+  >
+    <p style={textStyles}>{text}</p>
+    {isSelected && <span>&#10003;</span>}
+  </li>
+));
 
-### `npm run build` fails to minify
+SingleListItem.propTypes = {
+  index: PropTypes.number.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  onClickHandler: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+};
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// List Component
+const List = memo(({ items }) => {
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  useEffect(() => {
+    setSelectedIndex(null);
+  }, [items]);
+
+  const handleClick = (index) => {
+    setSelectedIndex(index);
+  };
+
+  return (
+    <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0 }}>
+      {items.map(({ text }, index) => (
+        <SingleListItem
+          key={index}
+          onClickHandler={() => handleClick(index)}
+          text={text}
+          index={index}
+          isSelected={selectedIndex === index}
+        />
+      ))}
+    </ul>
+  );
+});
+
+List.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired,
+    })
+  ),
+};
+
+List.defaultProps = {
+  items: [
+    { text: 'My fullname is Umang Dvenashu,I am pre-final year undergrad student who loves to explore new technologies and looking for opportunities where mystrategic work and knowledge could be best subjected. I am patient and determined which helped me to build my problem solving skills and being a good human' },
+    { text: 'Skills: C++,HTML,ReactJS,AngularJS,Git,GitHub,VCS,NodeJS,Express,DSA,DBMS,OS' },
+    { text: `Achievements: University Cultural Event- Winner of University mega Cultural Fest ONE INDIA Event(Team
+    Participation and Runner Up of University Youth Festival SPECTRA Event(Team Participation).`},
+    { text: `Experience: Technical Coordinator at DotQuestionmark where i have
+    worked as a Technical Coordinator in this community to explore and learn
+    different tech stacks.Learnt basic linux commands,some insights of data
+    prediction models and devops `},
+    { text: 'Contact Details: mailto: devumang096@gmail.com' },
+  ],
+};
+
+export default List;
+```
+# Check the Project 
+GitHub Repo Link -https://github.com/devumang096/UmangDevanshu_Front-End
+---
+---
+
+## <a href="https://devumang096.github.io/Umang-Devanshu_Front-End/" target="_blank">Live Website</a>
+
